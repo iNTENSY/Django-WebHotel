@@ -1,0 +1,28 @@
+.personal_wrap{
+    display: flex;
+}
+
+
+.photo{
+    width: 20%;
+    margin-right: 40px;
+  
+}
+
+.Users{
+    margin-bottom: 90px;
+}
+
+.personal_info{
+    width: 80%;
+}
+
+.value_inp{
+    padding: 10px 30px 10px 5px ;
+    background: #e8e8e8;
+    border-radius: 5%;
+}
+
+.personal_avatar{
+    width: 100%;
+}

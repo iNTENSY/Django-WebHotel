@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+    <main>
+    <form method="post">
+        {% csrf_token %}
+        <section>
+            <div class="container">
+                <div class="box_form_wrap">
+                <div class="login_box">
+                    <h2 class="title_box">Регистрация</h2>
+                    <form action="" method="post">
+                        <div class="user_box">
+                            <label for="inputUsername">Логин </label>
+                            {{ form.username }}
+                        </div>
+                        <div class="user_box">
+                            <label for="inputPassword">Пароль </label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="user_box">
+                            <label for="inputPassword">Повторите пароль </label>
+                            {{ form.password2 }}
+                        </div>
+
+                        <div class="btn_forms">
+                            <button class="btn_box" type="submit" id="submit">
+                                Готово
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
+    </main>
+{#    <form method="post">#}
+{#        {% csrf_token %}#}
+{#        {{ form.as_p }}#}
+{#        <button type="submit">Создать аккаунт!</button>#}
+{#    </form>#}
+{#</body>#}
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{%  if booking_list %}
+    {% for booking in booking_list %}
+        Запись на комнату №{{ booking.room__number }}<br>
+        Количество мест в комнате: {{ booking.room_reservation }}<br>
+        Цена за комнату: {{ booking.room__price }}<br>
+        Клиент: {{ booking.customers__username }}<br>
+        Дата заезда: {{ booking.start_of_booking|date:'d.m.Y'}}<br>
+        Дата выезда: {{ booking.end_of_booking|date:'d.m.Y'}}<br>
+        <form action="{% url 'users:booking-edit' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="accept">
+            <input type="hidden" name="accepted_room_number" value="{{ booking.room__number }}">
+            <input type="hidden" name="accepted_room_st_dt" value="{{ booking.start_of_booking|date:'d.m.Y' }}">
+            <input type="hidden" name="accepted_room_ed_dt" value="{{ booking.end_of_booking|date:'d.m.Y' }}">
+            <button type="submit">Подтвердить бронь</button>
+        </form>
+        <form action="{% url 'users:booking-edit' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="deny">
+            <input type="hidden" name="denied_room_number" value="{{ booking.room__number }}">
+            <input type="hidden" name="denied_room_st_dt" value="{{ booking.start_of_booking|date:'d.m.Y' }}">
+            <input type="hidden" name="denied_room_ed_dt" value="{{ booking.end_of_booking|date:'d.m.Y' }}">
+            <button type="submit">Удалить бронь</button>
+        </form>
+        <hr>
+    {% endfor %}
+{% else %}
+    Увы, ничего нет
+{% endif %}
+    <p><a href="{% url 'main:first-page' %}"><-- На главную</a></p>
+</body>
+</html>

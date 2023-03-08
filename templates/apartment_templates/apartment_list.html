@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% for room in rooms %}
+            <div class="wrap_card">
+                <div class="card">
+                <div class="card_top">
+                  <img src="{% static 'img/card1.jpg' %}" alt="" class="card_img" />
+                </div>
+                <div class="card_bottom">
+                    <h2 class="card_title">Комната {{ room.number }}</h2>
+                    <p class="card_price">{{ room.price }} руб. (в сутки)</p>
+                    <p class="card_seats">{{ room.reservation }} мест(а/о)</p>
+                    <a href="{% url 'main:subscribe-button' %}">Забронировать</a>
+                </div>
+                </div>
+            </div>
+        {% endfor %}
+{% endblock %}

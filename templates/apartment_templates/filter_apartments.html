@@ -1,0 +1,152 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="header_top">
+          <div class="header_top top-right">
+            <img src="{% static 'img/logo.svg' %}" alt="logo" class="header_img" />
+            <a class="header_telephone" href="">+7 000 222-11-99</a>
+          </div>
+          <div>
+              {% if request.user.is_authenticated %}
+                  {% if request.user.is_superuser %}
+                      <a href="http://127.0.0.1:8000/admin" class="header_intabce_text">Админ-панель Django</a>
+                  {% endif %}
+                  <a href="{% url 'users:profile' request.user.pk %}" class="header_intabce_text">Профиль: {{ user.username }}</a>
+                  <a href="{% url 'users:logout' %}" class="header_intabce_text">Выйти</a>
+              {% else %}
+                  <a href="{% url 'users:login' %}" class="header_intabce_text">Войти</a>
+                  <a href="{% url 'users:registration' %}" class="header_intabce_text">Зарегистрироваться</a>
+              {% endif %}
+            </div>
+        </div>
+
+        <nav class="nav">
+          <div class="nav_left">
+            <a class="nav_linkL" href="{% url 'main:first-page' %}">Главная</a>
+{#            <a class="nav_linkL" href="{% url 'main:all-app-page' %}">Размещение</a>#}
+            <a class="nav_linkL" href="#">Размещение</a>
+            <a class="nav_linkL" href="#">Контакты</a>
+            <a class="nav_linkL" href="{% url 'main:filter' %}">Фильтр</a>
+            {% if request.user.is_superuser %}
+                <a href="{% url 'users:booking-edit' %}" class="nav_linkL">Панель управления бронированием</a>
+            {% endif %}
+          </div>
+
+          <div class="nav_right">
+            <a class="nav_linkR" href="#">Хочу тур</a>
+            <a class="nav_linkR" href="#">Обратный звонок</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <form action="{% url 'main:filter' %}" method="get">
+        <h3>Количество мест:</h3>
+        {% for spot in view.get_count_of_spots %}
+            <input type="checkbox" name="spots" id="spots" value="{{ spot }}">
+            <label for="spots">{{ spot }}</label><br>
+        {% endfor %}
+
+        <h3>Цена</h3>
+        <label for="price_from">От</label>
+            <input type="number" name="price" id="price_from" min=0 value=0 required>
+        <label for="price_to">До</label>
+            <input type="number" name="price" id="price_to" min=0 value=10000 required> {# ДИКИЙ ХАРДКОДИНГ #}
+
+        <h3>Фильтр по времени</h3>
+        <label for="start">Заселение:</label>
+        <input type="text" id="start" name="trip" value="{% now 'Y-m-d' %}">
+
+        <label for="end">Выселение:</label>
+        <input type="text" id="end" name="trip" value="{% now 'Y-m-d' %}">
+
+        <input type="hidden" name="filter" value="turned">
+        <p><button type="submit">Найти</button></p>
+    </form>
+
+        {% for room in rooms %}
+            <div class="wrap_card">
+                <div class="card">
+                <div class="card_top">
+                  <img src="{% static 'img/card1.jpg' %}" alt="" class="card_img" />
+                </div>
+                <div class="card_bottom">
+                  <h2 class="card_title">Комната {{ room.number }}</h2>
+                  <p class="card_price">{{ room.price }} руб. (в сутки)</p>
+                  <p class="card_seats">{{ room.reservation }} мест(а/о)</p>
+                  <a class="card_btn" href="{% url 'main:subscribe-button' %}">Забронировать</a>
+                </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    <footer class="footer" id="footer">
+      <div class="container container-footer">
+        <div class="footer-left">
+          <a href="" class="footer-logo">
+            <img src="{% static 'img/logo.svg' %}" alt="Logo" class="footer-logo-img" />
+          </a>
+          <small class="footer-copyrights"
+            >Copyright ©2017. All Right Reserved</small
+          >
+        </div>
+
+        <div class="footer-right">
+          <nav class="footer-nav">
+            <ul class="footer-nav-list">
+              <li class="footer-nav-item">
+                <a href="#top" class="footer-nav-link">About Us</a>
+              </li>
+
+              <li class="footer-nav-item">
+                <a href="#" class="footer-nav-link">Contact Us</a>
+              </li>
+
+              <li class="footer-nav-item">
+                <a href="#" class="footer-nav-link">Privacy Policy</a>
+              </li>
+
+              <li class="footer-nav-item">
+                <a href="#" class="footer-nav-link">Terms Condition</a>
+              </li>
+            </ul>
+          </nav>
+
+          <ul class="footer-social-list">
+            <li class="footer-social-item">
+              <a href="#" class="footer-social-link">
+                <span class="footer-social-icon footer-social-icon-twitter"></span>
+              </a>
+            </li>
+
+            <li class="footer-social-item">
+              <a href="#" class="footer-social-link">
+                <span class="footer-social-icon footer-social-icon-in"></span>
+              </a>
+            </li>
+
+            <li class="footer-social-item">
+              <a href="#" class="footer-social-link">
+                <span class="footer-social-icon footer-social-icon-mail"></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!--footer-right-->
+      </div>
+      <!--container-->
+    </footer>
+
+  </body>
+</html>
