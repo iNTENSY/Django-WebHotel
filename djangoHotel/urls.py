@@ -24,8 +24,6 @@ from main.urls import views
 router = routers.SimpleRouter()
 router.register('apartments-admin', views.ApartmentsAdminViewSet)
 router.register('apartments', views.ApartmentsReadOnlyViewSet)
-# router.register('booking', views.BookingViewSet)
-# router.register('booking', views.BookingRetrieveDestroyAPIView.as_view())
 
 
 urlpatterns = [

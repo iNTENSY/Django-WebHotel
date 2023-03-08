@@ -52,9 +52,16 @@
     </header>
 
     <form action="{% url 'main:filter' %}" method="get">
+
+        <h3>Фильтр по цене:</h3>
+        <input type="radio" name="ordering" id="ordering1" value="price" checked>
+        <label for="ordering1">По возрастанию цены</label><br>
+        <input type="radio" name="ordering" id="ordering2" value="-price">
+        <label for="ordering2">По убыванию цены</label><br>
+
         <h3>Количество мест:</h3>
         {% for spot in view.get_count_of_spots %}
-            <input type="checkbox" name="spots" id="spots" value="{{ spot }}">
+            <input type="checkbox" name="spots" id="spots" value="{{ spot }}" checked>
             <label for="spots">{{ spot }}</label><br>
         {% endfor %}
 

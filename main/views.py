@@ -33,6 +33,7 @@ class FilterView(TitleMixin, ListView):
 
     def get_queryset(self):
         r = self.request.GET
+        ordering = r.get('ordering', 'price')
         if self.request.GET.get('filter'):
             prices = r.getlist('price', None)
             trip = r.getlist('trip', None)
@@ -42,13 +43,13 @@ class FilterView(TitleMixin, ListView):
                 Q(reservation__in=spots) & Q(price__range=prices)
             ).values('pk', 'number', 'price', 'reservation').exclude(
                 booking__start_of_booking__range=trip, booking__end_of_booking__range=trip
-            )
+            ).order_by(ordering)
         else:
-            queryset = Apartment.objects.all().values('pk', 'number', 'price', 'reservation')
-
+            queryset = Apartment.objects.all().values('pk', 'number', 'price', 'reservation').order_by(ordering)
         return queryset
 
-    def get_count_of_spots(self):
+    @staticmethod
+    def get_count_of_spots():
         return Apartment.objects.values_list('reservation', flat=True).order_by('reservation').distinct()
 
 
@@ -105,7 +106,7 @@ class ApartmentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class BookingCreateAPIView(CheckForBookingMixin, generics.CreateAPIView):
-    """ APIView для создания бронирования (без учета) """
+    """ API View для создания бронирования """
 
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
@@ -136,6 +137,8 @@ class BookingCreateAPIView(CheckForBookingMixin, generics.CreateAPIView):
 
 
 class BookingListAPIView(generics.ListAPIView):
+    """ API View для списка всех бронирований """
+
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsAdminUser,)
@@ -143,6 +146,8 @@ class BookingListAPIView(generics.ListAPIView):
 
 
 class BookingRetrieveDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """ API View для получения бронирования для конкретного пользователя """
+
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = (IsOwnerOrAdmin,)
