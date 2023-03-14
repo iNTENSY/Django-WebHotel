@@ -23,7 +23,6 @@ from main.urls import views
 
 router = routers.SimpleRouter()
 router.register('apartments-admin', views.ApartmentsAdminViewSet)
-router.register('apartments', views.ApartmentsReadOnlyViewSet)
 
 
 urlpatterns = [
@@ -32,6 +31,7 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
 
     path('api/v1/', include(router.urls)),
+    path('api/v1/apartments', views.ApartmentsListAPIView.as_view()),
     path('api/v1/booking/', views.BookingListAPIView.as_view()),
     path('api/v1/booking/<int:pk>', views.BookingRetrieveDestroyAPIView.as_view()),
     path('api/v1/create_booking/', views.BookingCreateAPIView.as_view()),

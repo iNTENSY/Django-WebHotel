@@ -34,7 +34,6 @@
         <nav class="nav">
           <div class="nav_left">
             <a class="nav_linkL" href="{% url 'main:first-page' %}">Главная</a>
-{#            <a class="nav_linkL" href="{% url 'main:all-app-page' %}">Размещение</a>#}
             <a class="nav_linkL" href="#">Размещение</a>
             <a class="nav_linkL" href="#">Контакты</a>
             <a class="nav_linkL" href="{% url 'main:filter' %}">Фильтр</a>
@@ -51,52 +50,25 @@
       </div>
     </header>
 
-    <form action="{% url 'main:filter' %}" method="get">
-
-        <h3>Фильтр по цене:</h3>
-        <input type="radio" name="ordering" id="ordering1" value="price" checked>
-        <label for="ordering1">По возрастанию цены</label><br>
-        <input type="radio" name="ordering" id="ordering2" value="-price">
-        <label for="ordering2">По убыванию цены</label><br>
-
-        <h3>Количество мест:</h3>
-        {% for spot in view.get_count_of_spots %}
-            <input type="checkbox" name="spots" id="spots" value="{{ spot }}" checked>
-            <label for="spots">{{ spot }}</label><br>
-        {% endfor %}
-
-        <h3>Цена</h3>
-        <label for="price_from">От</label>
-            <input type="number" name="price" id="price_from" min=0 value=0 required>
-        <label for="price_to">До</label>
-            <input type="number" name="price" id="price_to" min=0 value=10000 required> {# ДИКИЙ ХАРДКОДИНГ #}
-
-        <h3>Фильтр по времени</h3>
-        <label for="start">Заселение:</label>
-        <input type="text" id="start" name="trip" value="{% now 'Y-m-d' %}">
-
-        <label for="end">Выселение:</label>
-        <input type="text" id="end" name="trip" value="{% now 'Y-m-d' %}">
-
-        <input type="hidden" name="filter" value="turned">
-        <p><button type="submit">Найти</button></p>
+    <form method="get">
+        {{ filter.form.as_p }}
+        <button type="submit">Найти!</button>
     </form>
-
-        {% for room in rooms %}
-            <div class="wrap_card">
-                <div class="card">
-                <div class="card_top">
-                  <img src="{% static 'img/card1.jpg' %}" alt="" class="card_img" />
-                </div>
-                <div class="card_bottom">
-                  <h2 class="card_title">Комната {{ room.number }}</h2>
-                  <p class="card_price">{{ room.price }} руб. (в сутки)</p>
-                  <p class="card_seats">{{ room.reservation }} мест(а/о)</p>
-                  <a class="card_btn" href="{% url 'main:subscribe-button' %}">Забронировать</a>
-                </div>
-                </div>
+    {% for room in filter.qs %}
+        <div class="wrap_card">
+            <div class="card">
+            <div class="card_top">
+              <img src="{% static 'img/card1.jpg' %}" alt="" class="card_img" />
             </div>
-        {% endfor %}
+            <div class="card_bottom">
+              <h2 class="card_title">{{ room }}</h2>
+              <p class="card_price">{{ room.price }} руб. (в сутки)</p>
+              <p class="card_seats">{{ room.reservation }} мест(а/о)</p>
+              <a class="card_btn" href="{% url 'main:subscribe-button' %}">Забронировать</a>
+            </div>
+            </div>
+        </div>
+    {% endfor %}
 
     <footer class="footer" id="footer">
       <div class="container container-footer">

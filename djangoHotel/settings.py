@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'main',
     'users',
     'debug_toolbar',
@@ -89,12 +90,21 @@ WSGI_APPLICATION = 'djangoHotel.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hotel_db',
-        'USER': 'postgres',
+        'NAME': config.DB_NAME,
+        'USER': config.DB_USER,
         'PASSWORD': config.DB_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'HOST': config.DB_HOST,
+        'PORT': config.DB_PORT,
     }
+}
+
+REST_FRAMEWORK = {
+    'DATE_INPUT_FORMATS': '%d.%m.%Y',
+    'DATETIME_FORMAT': '%d.%m.%Y %H:%M:%S',
+    'DATE_FORMAT': '%d.%m.%Y',
+    'DEFAULT_FILTER_BACKENDS': (
+            'django_filters.rest_framework.DjangoFilterBackend',
+        ),
 }
 
 

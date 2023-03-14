@@ -6,11 +6,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, CreateView
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import generics
 from rest_framework.response import Response
 
+from .filters import ApartmentFilter
 from .models import Booking, Apartment
 from common_utils.utils import TitleMixin, CheckForBookingMixin
 from .permissions import IsOwnerOrAdmin
@@ -25,32 +27,17 @@ class MainPageView(TitleMixin, ListView):
     context_object_name = 'rooms'
 
 
-class FilterView(TitleMixin, ListView):
+class MyFilterView(TitleMixin, ListView):
     """ Отображение страницы с фильтром """
 
+    model = Apartment
     template_name = 'apartment_templates/filter_apartments.html'
     context_object_name = 'rooms'
 
-    def get_queryset(self):
-        r = self.request.GET
-        ordering = r.get('ordering', 'price')
-        if self.request.GET.get('filter'):
-            prices = r.getlist('price', None)
-            trip = r.getlist('trip', None)
-            spots = r.getlist('spots', None)
-
-            queryset = Apartment.objects.filter(
-                Q(reservation__in=spots) & Q(price__range=prices)
-            ).values('pk', 'number', 'price', 'reservation').exclude(
-                booking__start_of_booking__range=trip, booking__end_of_booking__range=trip
-            ).order_by(ordering)
-        else:
-            queryset = Apartment.objects.all().values('pk', 'number', 'price', 'reservation').order_by(ordering)
-        return queryset
-
-    @staticmethod
-    def get_count_of_spots():
-        return Apartment.objects.values_list('reservation', flat=True).order_by('reservation').distinct()
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(MyFilterView, self).get_context_data(**kwargs)
+        context['filter'] = ApartmentFilter(self.request.GET, queryset=self.get_queryset())
+        return context
 
 
 class ReservationView(LoginRequiredMixin, CheckForBookingMixin, CreateView):
@@ -98,11 +85,13 @@ class ApartmentsAdminViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
 
 
-class ApartmentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
+class ApartmentsListAPIView(generics.ListAPIView):
     """ ViewSet для пользователя сайта """
 
     queryset = Apartment.objects.all()
     serializer_class = ApartmentSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ApartmentFilter
 
 
 class BookingCreateAPIView(CheckForBookingMixin, generics.CreateAPIView):
