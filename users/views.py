@@ -14,14 +14,14 @@ from .forms import LoginForm, RegistrationForm
 class UserProfileView(TitleMixin, LoginRequiredMixin, TemplateView):
     """ Отображение профиля пользователя """
 
-    title = 'Профиль'
-    template_name = 'user_templates/profile.html'
-    context_object_name = 'profile'
+    title: str = 'Профиль'
+    template_name: str = 'user_templates/profile.html'
+    context_object_name: str = 'profile'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(UserProfileView, self).get_context_data()
-        user_pk = kwargs.get('pk')
-        queryset = Booking.objects.select_related('room').filter(customers_id=user_pk)\
+        context: dict = super(UserProfileView, self).get_context_data()
+        user_pk: int = kwargs.get('pk')
+        queryset: object = Booking.objects.select_related('room').filter(customers_id=user_pk)\
             .values(
             'room__number', 'room__price', 'room__reservation',
             'start_of_booking', 'end_of_booking', 'is_accepted'
@@ -33,9 +33,9 @@ class UserProfileView(TitleMixin, LoginRequiredMixin, TemplateView):
 class LoginPageView(TitleMixin, LoginView):
     """ Отображение страницы с формой для авторизации """
 
-    title = 'Авторизация'
-    form_class = LoginForm
-    template_name = 'user_templates/login.html'
+    title: str = 'Авторизация'
+    form_class: object = LoginForm
+    template_name: str = 'user_templates/login.html'
 
     def get_success_url(self):
         return reverse_lazy('main:first-page')
@@ -44,9 +44,9 @@ class LoginPageView(TitleMixin, LoginView):
 class RegistrationPageView(TitleMixin, CreateView):
     """ Отображение страницы с формой для регистрации """
 
-    title = 'Регистрация'
-    form_class = RegistrationForm
-    template_name = 'user_templates/registration.html'
+    title: str = 'Регистрация'
+    form_class: object = RegistrationForm
+    template_name: str = 'user_templates/registration.html'
 
     def get_success_url(self):
         return reverse_lazy('users:login')
@@ -55,30 +55,33 @@ class RegistrationPageView(TitleMixin, CreateView):
 class LogoutButton(LogoutView):
     """ Отображение кнопки с возможностью выхода из аккаунта """
 
-    next_page = reverse_lazy('main:first-page')
+    next_page: str = reverse_lazy('main:first-page')
 
 
 class EditPageView(SuperuserRequiredMixin, ListView):
     """ Отображение страницы для администраторов с возможностью принять/удалить бронирование """
 
-    queryset = Booking.objects.filter(is_accepted=False).select_related('room')\
+    queryset: object = Booking.objects.filter(is_accepted=False).select_related('room')\
         .values(
         'room__number', 'room__price', 'room__reservation',
         'customers__username', 'start_of_booking', 'end_of_booking'
     )
-    template_name = 'user_templates/edit_page.html'
-    context_object_name = 'booking_list'
+    template_name: str = 'user_templates/edit_page.html'
+    context_object_name: str = 'booking_list'
 
     def post(self, request, **kwargs):
-        status = request.POST.get('status')
-        room_number = request.POST.get('accepted_room_number', None) or request.POST.get('denied_room_number', None)
-        booking_start = request.POST.get('accepted_room_st_dt', None) or request.POST.get('accepted_room_ed_dt', None)
-        booking_end = request.POST.get('accepted_room_ed_dt', None) or request.POST.get('denied_room_ed_dt', None)
+        status: int = request.POST.get('status')
+        room_number: int | None = request.POST.get('accepted_room_number', None)\
+                                  or request.POST.get('denied_room_number', None)
+        booking_start: str | None = request.POST.get('accepted_room_st_dt', None) \
+                                    or request.POST.get('accepted_room_ed_dt', None)
+        booking_end: str | None = request.POST.get('accepted_room_ed_dt', None) \
+                      or request.POST.get('denied_room_ed_dt', None)
 
-        start_of_booking = dt.strptime(booking_start, '%d.%m.%Y')
-        end_of_booking = dt.strptime(booking_end, '%d.%m.%Y')
+        start_of_booking: dt = dt.strptime(booking_start, '%d.%m.%Y')
+        end_of_booking: dt = dt.strptime(booking_end, '%d.%m.%Y')
 
-        booking = Booking.objects.get(
+        booking: Booking = Booking.objects.get(
             room__number=room_number,
             start_of_booking=start_of_booking,
             end_of_booking=end_of_booking

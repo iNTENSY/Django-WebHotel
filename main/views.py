@@ -1,7 +1,6 @@
 from datetime import datetime as dt
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
@@ -30,12 +29,12 @@ class MainPageView(TitleMixin, ListView):
 class MyFilterView(TitleMixin, ListView):
     """ Отображение страницы с фильтром """
 
-    model = Apartment
-    template_name = 'apartment_templates/filter_apartments.html'
-    context_object_name = 'rooms'
+    model: object = Apartment
+    template_name: str = 'apartment_templates/filter_apartments.html'
+    context_object_name: str = 'rooms'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(MyFilterView, self).get_context_data(**kwargs)
+        context: dict = super(MyFilterView, self).get_context_data(**kwargs)
         context['filter'] = ApartmentFilter(self.request.GET, queryset=self.get_queryset())
         return context
 
@@ -43,19 +42,19 @@ class MyFilterView(TitleMixin, ListView):
 class ReservationView(LoginRequiredMixin, CheckForBookingMixin, CreateView):
     """ Отображение страницы для бронирования"""
 
-    model = Booking
-    login_url = 'users:login'
-    template_name = 'apartment_templates/reservation.html'
-    fields = ['room', 'start_of_booking', 'end_of_booking']
+    model: object = Booking
+    login_url: str = 'users:login'
+    template_name: str = 'apartment_templates/reservation.html'
+    fields: list[str] = ['room', 'start_of_booking', 'end_of_booking']
 
     def post(self, request, **kwargs):
-        user = request.user
-        room = Apartment.objects.get(number=request.POST.get('room'))
-        start_of_booking = dt.strptime(request.POST.get('start_of_booking'), '%d.%m.%Y')
-        end_of_booking = dt.strptime(request.POST.get('end_of_booking'), '%d.%m.%Y')
-        template_name = 'apartment_templates/oops.html'
+        user: object = request.user
+        room: Apartment = Apartment.objects.get(number=request.POST.get('room'))
+        start_of_booking: dt = dt.strptime(request.POST.get('start_of_booking'), '%d.%m.%Y')
+        end_of_booking: dt = dt.strptime(request.POST.get('end_of_booking'), '%d.%m.%Y')
+        template_name: str = 'apartment_templates/oops.html'
 
-        is_allowed = self.check_booking(user, room, start_of_booking, end_of_booking)
+        is_allowed: bool = self.check_booking(user, room, start_of_booking, end_of_booking)
 
         if is_allowed:
             return redirect('main:first-page')
@@ -65,14 +64,14 @@ class ReservationView(LoginRequiredMixin, CheckForBookingMixin, CreateView):
 class DeleteReservationView(LoginRequiredMixin, View):
     """ Удаление бронирования """
 
-    login_url = 'users:login'
+    login_url: str = 'users:login'
 
     def post(self, request, **kwargs):
-        room_number = request.POST.get('room_number')
-        start = dt.strptime(request.POST.get('start'), '%d.%m.%Y')
-        end = dt.strptime(request.POST.get('end'), '%d.%m.%Y')
+        room_number: int = request.POST.get('room_number')
+        start: dt = dt.strptime(request.POST.get('start'), '%d.%m.%Y')
+        end: dt = dt.strptime(request.POST.get('end'), '%d.%m.%Y')
 
-        booking = Booking.objects.get(room__number=room_number, start_of_booking=start, end_of_booking=end)
+        booking: Booking = Booking.objects.get(room__number=room_number, start_of_booking=start, end_of_booking=end)
         booking.delete()
         return redirect(reverse('users:profile', kwargs={'pk': request.user.pk}))
 
@@ -102,12 +101,12 @@ class BookingCreateAPIView(CheckForBookingMixin, generics.CreateAPIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
 
     def perform_create(self, serializer):
-        user = serializer.data['customers']
-        room = Apartment.objects.get(number=serializer.data['room'])
-        start_of_booking = dt.strptime(serializer.data['start_of_booking'], '%Y-%m-%d')
-        end_of_booking = dt.strptime(serializer.data['end_of_booking'], '%Y-%m-%d')
+        user: str = serializer.data['customers']
+        room: Apartment = Apartment.objects.get(number=serializer.data['room'])
+        start_of_booking: dt = dt.strptime(serializer.data['start_of_booking'], '%Y-%m-%d')
+        end_of_booking: dt = dt.strptime(serializer.data['end_of_booking'], '%Y-%m-%d')
 
-        is_allowed = self.check_booking(user, room, start_of_booking, end_of_booking)
+        is_allowed: bool = self.check_booking(user, room, start_of_booking, end_of_booking)
 
         if is_allowed:
             serializer.save()

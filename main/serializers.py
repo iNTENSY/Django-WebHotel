@@ -5,11 +5,11 @@ from .models import Apartment, Booking
 
 class ApartmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Apartment
-        fields = ('number', 'price', 'reservation', 'created_at')
+        model: object = Apartment
+        fields: tuple[str] = ('number', 'price', 'reservation', 'created_at')
 
 
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Booking
-        fields = '__all__'
+        model: object = Booking
+        fields: str = '__all__'
